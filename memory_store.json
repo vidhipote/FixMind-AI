@@ -1,0 +1,7 @@
+[
+    {
+        "problem": "STM32 UART TX not working",
+        "solution": "### Possible Causes\n- Incorrect GPIO configuration (Alternate Function, mode).\n- UART peripheral clock not enabled.\n- Baud rate mismatch or invalid UART settings.\n- TX interrupt/DMA issues (if used).\n\n### Step-by-Step Checks\n1. Check RCC clock enable for the specific UART and its GPIO port.\n2. Verify GPIO Alternate Function (AF) mode and output type for the TX pin.\n3. Confirm UART_CR1 settings (baud rate, word length, parity, TE bit).\n4. Use a logic analyzer or oscilloscope on the TX pin to observe output.\n\n### Most Likely Fix\nThe most common issue is the GPIO pin not correctly configured for its Alternate Function (AF) mode for UART TX, or the UART peripheral's clock not being enabled. Correct these two first.\n\n### Prevention Tip\nAlways use STM32CubeMX to generate initial peripheral configurations and double-check GPIO Alternate Function settings in the code.",
+        "date": "28-06-2026 17:09"
+    }
+]
