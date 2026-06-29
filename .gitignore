@@ -1,9 +1,9 @@
 venv/
-
 .env
-
 pycache/
-
 *.pyc
-
 .chroma/
+memory_store.json
+.streamlit/
+.vscode/
+screenshots/
