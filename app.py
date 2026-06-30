@@ -10,7 +10,11 @@ from memory.memory_manager import (
     delete_memory,
 )
 
-from memory.cognee_memory import remember_with_cognee, recall_with_cognee
+from memory.cognee_memory import (
+    remember_with_cognee,
+    recall_with_cognee,
+    forget_from_cognee,
+)
 
 load_dotenv()
 
@@ -93,7 +97,6 @@ def format_cognee_results(results):
                     if any(phrase in search_result.lower() for phrase in invalid_phrases):
                         return ""
                     return search_result
-
     except Exception:
         pass
 
@@ -106,16 +109,17 @@ st.set_page_config(
     layout="wide"
 )
 
-
 st.markdown("""
 <style>
 
 .stApp {
-    background: linear-gradient(135deg, #020617 0%, #0f172a 45%, #111827 100%);
+    background:
+        radial-gradient(circle at 20% 20%, rgba(56,189,248,0.16), transparent 30%),
+        radial-gradient(circle at 80% 10%, rgba(34,197,94,0.12), transparent 25%),
+        linear-gradient(135deg, #020617 0%, #0f172a 45%, #111827 100%);
     color: #e5e7eb;
 }
 
-/* Animated circuit background */
 .stApp::before {
     content: "";
     position: fixed;
@@ -145,7 +149,7 @@ section[data-testid="stSidebar"] * {
 
 h1, h2, h3 {
     color: #38bdf8 !important;
-    font-weight: 800 !important;
+    font-weight: 900 !important;
 }
 
 p, li, label {
@@ -153,34 +157,30 @@ p, li, label {
 }
 
 .hardware-card {
-    background: linear-gradient(135deg, #0f172a, #111827);
+    background: linear-gradient(135deg, rgba(15,23,42,0.95), rgba(17,24,39,0.95));
     border: 1px solid #334155;
-    border-radius: 22px;
-    padding: 32px;
+    border-radius: 24px;
+    padding: 34px;
     margin-bottom: 26px;
     box-shadow: 0 0 28px rgba(56, 189, 248, 0.15);
     animation: softGlow 3s ease-in-out infinite alternate;
 }
 
 @keyframes softGlow {
-    from {
-        box-shadow: 0 0 18px rgba(56, 189, 248, 0.12);
-    }
-    to {
-        box-shadow: 0 0 34px rgba(34, 197, 94, 0.24);
-    }
+    from { box-shadow: 0 0 18px rgba(56, 189, 248, 0.12); }
+    to { box-shadow: 0 0 36px rgba(34, 197, 94, 0.25); }
 }
 
 .ai-chip {
-    font-size: 62px;
+    font-size: 68px;
     animation: floatChip 3s ease-in-out infinite;
-    text-shadow: 0 0 22px rgba(56,189,248,0.7);
+    text-shadow: 0 0 24px rgba(56,189,248,0.8);
 }
 
 @keyframes floatChip {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-12px); }
-    100% { transform: translateY(0px); }
+    0% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-12px) rotate(4deg); }
+    100% { transform: translateY(0px) rotate(0deg); }
 }
 
 .led {
@@ -189,7 +189,7 @@ p, li, label {
     background-color: #22c55e;
     border-radius: 50%;
     display: inline-block;
-    box-shadow: 0 0 12px #22c55e;
+    box-shadow: 0 0 14px #22c55e;
     animation: blink 1.2s infinite;
     margin-right: 8px;
 }
@@ -206,8 +206,8 @@ p, li, label {
     padding: 8px 15px;
     border-radius: 999px;
     font-size: 13px;
-    font-weight: 700;
-    margin: 5px 6px 0 0;
+    font-weight: 800;
+    margin: 6px 7px 0 0;
 }
 
 .warning-badge {
@@ -217,8 +217,29 @@ p, li, label {
     padding: 8px 15px;
     border-radius: 999px;
     font-size: 13px;
-    font-weight: 700;
-    margin: 5px 6px 0 0;
+    font-weight: 800;
+    margin: 6px 7px 0 0;
+}
+
+.protocol-card {
+    background: #020617;
+    border: 1px solid #334155;
+    border-radius: 18px;
+    padding: 18px;
+    text-align: center;
+    transition: 0.25s ease;
+    box-shadow: 0 0 16px rgba(56,189,248,0.08);
+}
+
+.protocol-card:hover {
+    transform: translateY(-5px);
+    border-color: #22c55e;
+    box-shadow: 0 0 24px rgba(34,197,94,0.22);
+}
+
+.protocol-icon {
+    font-size: 30px;
+    margin-bottom: 8px;
 }
 
 .memory-card {
@@ -228,15 +249,6 @@ p, li, label {
     padding: 22px;
     margin: 20px 0;
     box-shadow: 0 0 18px rgba(34, 197, 94, 0.14);
-}
-
-.response-card {
-    background: #020617;
-    border: 1px solid #334155;
-    border-radius: 18px;
-    padding: 24px;
-    margin-top: 18px;
-    box-shadow: 0 0 18px rgba(56, 189, 248, 0.12);
 }
 
 .stat-card {
@@ -259,6 +271,22 @@ p, li, label {
     color: #94a3b8;
 }
 
+.pipeline {
+    background: #020617;
+    border: 1px dashed #334155;
+    border-radius: 18px;
+    padding: 18px;
+    margin: 20px 0;
+    text-align: center;
+    color: #e5e7eb;
+    box-shadow: 0 0 18px rgba(56,189,248,0.08);
+}
+
+.pipeline span {
+    color: #22c55e;
+    font-weight: 800;
+}
+
 .stTextArea textarea {
     background-color: #020617 !important;
     color: #e5e7eb !important;
@@ -272,35 +300,15 @@ p, li, label {
     border: none;
     border-radius: 12px;
     padding: 0.65rem 1.1rem;
-    font-weight: 700;
+    font-weight: 800;
     transition: 0.25s ease;
-    position: relative;
-    overflow: hidden;
 }
 
 .stButton button:hover {
     background: linear-gradient(90deg, #0369a1, #16a34a);
-    transform: scale(1.02);
+    transform: scale(1.03);
     color: white !important;
     border: none;
-}
-
-.stButton button::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -80%;
-    width: 50%;
-    height: 100%;
-    background: rgba(255,255,255,0.25);
-    transform: skewX(-20deg);
-    animation: shine 3s infinite;
-}
-
-@keyframes shine {
-    0% { left: -80%; }
-    50% { left: 130%; }
-    100% { left: 130%; }
 }
 
 div[data-testid="stAlert"] {
@@ -318,6 +326,7 @@ hr {
 st.sidebar.markdown("## 🛠️ FixMind")
 st.sidebar.markdown("### Embedded AI Debugger")
 page = st.sidebar.radio("Navigation", ["🏠 Home", "📚 Memory History", "ℹ️ About"])
+
 
 for key, default in {
     "problem": "",
@@ -337,7 +346,7 @@ if page == "🏠 Home":
 
     st.markdown("""
     <div class="hardware-card">
-        <div style="display:flex; align-items:center; gap:25px;">
+        <div style="display:flex; align-items:center; gap:28px;">
             <div class="ai-chip">⚙️</div>
             <div>
                 <h1>🛠️ FixMind</h1>
@@ -379,6 +388,38 @@ if page == "🏠 Home":
         </div>
         """, unsafe_allow_html=True)
 
+    st.markdown("""
+    <div class="pipeline">
+        🔧 Problem Input &nbsp; → &nbsp;
+        <span>🧠 Memory Recall</span> &nbsp; → &nbsp;
+        ⚙️ Gemini Analysis &nbsp; → &nbsp;
+        <span>💾 Save Debug Fix</span>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("### 🔌 Supported Hardware Debug Areas")
+
+    p1, p2, p3, p4, p5 = st.columns(5)
+
+    cards = [
+        ("📡", "UART", "Serial TX/RX"),
+        ("⚡", "SPI", "Sensor Bus"),
+        ("🔌", "I2C", "Device Detect"),
+        ("📈", "ADC", "Signal Read"),
+        ("🧩", "GPIO", "Pin Logic"),
+    ]
+
+    for col, card in zip([p1, p2, p3, p4, p5], cards):
+        icon, title, desc = card
+        with col:
+            st.markdown(f"""
+            <div class="protocol-card">
+                <div class="protocol-icon">{icon}</div>
+                <h3>{title}</h3>
+                <p>{desc}</p>
+            </div>
+            """, unsafe_allow_html=True)
+
     st.markdown("### 🔧 Describe Your Embedded Systems Problem")
 
     problem_input = st.text_area(
@@ -387,7 +428,7 @@ if page == "🏠 Home":
         value=st.session_state.problem
     )
 
-    if st.button("🚀 Ask FixMind"):
+    if st.button("🚀 Analyze Hardware Issue"):
         if problem_input.strip() == "":
             st.warning("Please enter your problem.")
         else:
@@ -410,27 +451,33 @@ if page == "🏠 Home":
                 st.session_state.memory_found = [{
                     "problem": "Cognee Semantic Memory Match",
                     "date": "Retrieved from Cognee",
-                    "solution": formatted_cognee
+                    "solution": formatted_cognee,
+                    "source": "cognee"
                 }]
             else:
-                st.session_state.memory_found = search_memory(problem_input)
+                json_memory = search_memory(problem_input)
+                if json_memory:
+                    json_memory[0]["source"] = "json"
+                st.session_state.memory_found = json_memory
 
             if not st.session_state.memory_found:
                 st.session_state.show_ai_answer = True
 
     if st.session_state.memory_found and not st.session_state.show_ai_answer:
         memory = st.session_state.memory_found[0]
+        memory_source = memory.get("source", "json")
 
         st.markdown(f"""
         <div class="memory-card">
             <h3>🧠 Similar Engineering Memory Found</h3>
             <p><b>Stored Problem:</b> {memory['problem']}</p>
             <p><b>Saved:</b> {memory['date']}</p>
+            <p><b>Source:</b> {memory_source.upper()}</p>
             <p>This previous debugging session may help with your current hardware issue.</p>
         </div>
         """, unsafe_allow_html=True)
 
-        col1, col2 = st.columns(2)
+        col1, col2, col3 = st.columns(3)
 
         with col1:
             if st.button("👁 View Previous Fix"):
@@ -446,15 +493,34 @@ if page == "🏠 Home":
                 st.session_state.answer = ""
                 st.session_state.saved = False
 
+        with col3:
+            if memory_source == "cognee":
+                if st.button("🗑 Delete Cognee Memory"):
+                    with st.spinner("Deleting from Cognee memory..."):
+                        deleted = forget_from_cognee(st.session_state.problem)
+
+                    if deleted:
+                        st.success("Cognee memory deleted successfully.")
+                    else:
+                        st.warning("Cognee memory delete failed.")
+
+                    st.session_state.memory_found = []
+                    st.session_state.selected_memory = None
+                    st.session_state.show_memory = False
+                    st.session_state.show_ai_answer = True
+                    st.session_state.answer = ""
+                    st.session_state.saved = False
+                    st.rerun()
+            else:
+                st.info("Delete JSON memories from Memory History page.")
+
     if st.session_state.show_memory and st.session_state.selected_memory:
         memory = st.session_state.selected_memory
 
-        st.markdown('<div class="response-card">', unsafe_allow_html=True)
         st.markdown("## Previous Fix")
         st.write(f"**Problem:** {memory['problem']}")
         st.write(f"**Date:** {memory['date']}")
         st.markdown(memory["solution"])
-        st.markdown('</div>', unsafe_allow_html=True)
 
     if st.session_state.show_ai_answer:
         if st.session_state.answer == "":
@@ -467,15 +533,11 @@ if page == "🏠 Home":
 
         if st.session_state.answer:
             st.success("✅ FixMind Response")
-
-            st.markdown('<div class="response-card">', unsafe_allow_html=True)
             st.markdown(st.session_state.answer)
-            st.markdown('</div>', unsafe_allow_html=True)
-
             st.divider()
 
             if not st.session_state.saved:
-                if st.button("💾 Mark as Solved and Save Memory"):
+                if st.button("💾 Save Engineering Knowledge"):
                     json_saved = save_memory(
                         st.session_state.problem,
                         st.session_state.answer
@@ -534,9 +596,9 @@ elif page == "📚 Memory History":
                 st.write(f"**Date:** {memory['date']}")
                 st.markdown(memory["solution"])
 
-                if st.button("🗑 Delete Memory", key=f"delete_{index}"):
+                if st.button("🗑 Delete JSON Memory", key=f"delete_{index}"):
                     delete_memory(index)
-                    st.success("Memory deleted successfully!")
+                    st.success("JSON memory deleted successfully!")
                     st.rerun()
 
 
@@ -560,6 +622,1234 @@ else:
         </div>
     </div>
     """, unsafe_allow_html=True)
+
+
+
+
+
+
+
+
+# import streamlit as st
+# import google.generativeai as genai
+# from dotenv import load_dotenv
+# import os
+
+# from memory.memory_manager import (
+#     save_memory,
+#     load_memories,
+#     search_memory,
+#     delete_memory,
+# )
+
+# from memory.cognee_memory import remember_with_cognee, recall_with_cognee
+
+# load_dotenv()
+
+# USE_COGNEE = os.getenv("USE_COGNEE", "false").lower() == "true"
+
+# genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+# model = genai.GenerativeModel("gemini-2.5-flash")
+
+
+# def ask_gemini(problem):
+#     prompt = f"""
+# You are FixMind, a senior Embedded Systems debugging assistant.
+
+# User problem:
+# {problem}
+
+# Give a SHORT, practical debugging response.
+
+# Use exactly this format:
+
+# ### Possible Causes
+# - Cause 1
+# - Cause 2
+# - Cause 3
+# - Cause 4
+
+# ### Step-by-Step Checks
+# 1. Check ...
+# 2. Verify ...
+# 3. Test ...
+# 4. Confirm ...
+
+# ### Most Likely Fix
+# Write the most likely fix in 2-3 lines.
+
+# ### Prevention Tip
+# Write one practical prevention tip.
+
+# Rules:
+# - Keep the answer concise.
+# - Focus on STM32, ESP32, Arduino, UART, SPI, I2C, ADC, sensors, embedded hardware.
+# """
+#     response = model.generate_content(prompt)
+#     return response.text
+
+
+# def format_cognee_results(results):
+#     if not results:
+#         return ""
+
+#     invalid_phrases = [
+#         "does not contain any information",
+#         "does not contain information",
+#         "provided context does not",
+#         "no information about",
+#         "cannot answer",
+#         "not enough information",
+#         "no relevant information",
+#     ]
+
+#     text = str(results).strip()
+
+#     if any(phrase in text.lower() for phrase in invalid_phrases):
+#         return ""
+
+#     try:
+#         if isinstance(results, list):
+#             first = results[0]
+
+#             if isinstance(first, dict):
+#                 search_result = first.get("search_result", "")
+
+#                 if isinstance(search_result, list) and search_result:
+#                     return str(search_result[0])
+
+#                 if isinstance(search_result, str):
+#                     return search_result
+#     except Exception:
+#         pass
+
+#     return text
+
+
+# st.set_page_config(
+#     page_title="FixMind",
+#     page_icon="🛠️",
+#     layout="wide"
+# )
+
+# st.markdown("""
+# <style>
+
+# .stApp {
+#     background:
+#         radial-gradient(circle at 20% 20%, rgba(56,189,248,0.16), transparent 30%),
+#         radial-gradient(circle at 80% 10%, rgba(34,197,94,0.12), transparent 25%),
+#         linear-gradient(135deg, #020617 0%, #0f172a 45%, #111827 100%);
+#     color: #e5e7eb;
+# }
+
+# .stApp::before {
+#     content: "";
+#     position: fixed;
+#     inset: 0;
+#     background-image:
+#         linear-gradient(rgba(56,189,248,0.07) 1px, transparent 1px),
+#         linear-gradient(90deg, rgba(56,189,248,0.07) 1px, transparent 1px);
+#     background-size: 42px 42px;
+#     animation: circuitMove 18s linear infinite;
+#     pointer-events: none;
+#     z-index: 0;
+# }
+
+# @keyframes circuitMove {
+#     from { background-position: 0 0; }
+#     to { background-position: 120px 120px; }
+# }
+
+# section[data-testid="stSidebar"] {
+#     background: #020617;
+#     border-right: 1px solid #1e293b;
+# }
+
+# section[data-testid="stSidebar"] * {
+#     color: #e5e7eb !important;
+# }
+
+# h1, h2, h3 {
+#     color: #38bdf8 !important;
+#     font-weight: 900 !important;
+# }
+
+# p, li, label {
+#     color: #d1d5db !important;
+# }
+
+# .hardware-card {
+#     background: linear-gradient(135deg, rgba(15,23,42,0.95), rgba(17,24,39,0.95));
+#     border: 1px solid #334155;
+#     border-radius: 24px;
+#     padding: 34px;
+#     margin-bottom: 26px;
+#     box-shadow: 0 0 28px rgba(56, 189, 248, 0.15);
+#     animation: softGlow 3s ease-in-out infinite alternate;
+# }
+
+# @keyframes softGlow {
+#     from { box-shadow: 0 0 18px rgba(56, 189, 248, 0.12); }
+#     to { box-shadow: 0 0 36px rgba(34, 197, 94, 0.25); }
+# }
+
+# .ai-chip {
+#     font-size: 68px;
+#     animation: floatChip 3s ease-in-out infinite;
+#     text-shadow: 0 0 24px rgba(56,189,248,0.8);
+# }
+
+# @keyframes floatChip {
+#     0% { transform: translateY(0px) rotate(0deg); }
+#     50% { transform: translateY(-12px) rotate(4deg); }
+#     100% { transform: translateY(0px) rotate(0deg); }
+# }
+
+# .led {
+#     height: 12px;
+#     width: 12px;
+#     background-color: #22c55e;
+#     border-radius: 50%;
+#     display: inline-block;
+#     box-shadow: 0 0 14px #22c55e;
+#     animation: blink 1.2s infinite;
+#     margin-right: 8px;
+# }
+
+# @keyframes blink {
+#     0%, 100% { opacity: 1; }
+#     50% { opacity: 0.25; }
+# }
+
+# .feature-badge {
+#     display: inline-block;
+#     background: #064e3b;
+#     color: #bbf7d0;
+#     padding: 8px 15px;
+#     border-radius: 999px;
+#     font-size: 13px;
+#     font-weight: 800;
+#     margin: 6px 7px 0 0;
+# }
+
+# .warning-badge {
+#     display: inline-block;
+#     background: #78350f;
+#     color: #fde68a;
+#     padding: 8px 15px;
+#     border-radius: 999px;
+#     font-size: 13px;
+#     font-weight: 800;
+#     margin: 6px 7px 0 0;
+# }
+
+# .protocol-card {
+#     background: #020617;
+#     border: 1px solid #334155;
+#     border-radius: 18px;
+#     padding: 18px;
+#     text-align: center;
+#     transition: 0.25s ease;
+#     box-shadow: 0 0 16px rgba(56,189,248,0.08);
+# }
+
+# .protocol-card:hover {
+#     transform: translateY(-5px);
+#     border-color: #22c55e;
+#     box-shadow: 0 0 24px rgba(34,197,94,0.22);
+# }
+
+# .protocol-icon {
+#     font-size: 30px;
+#     margin-bottom: 8px;
+# }
+
+# .memory-card {
+#     background: #0f172a;
+#     border-left: 5px solid #22c55e;
+#     border-radius: 18px;
+#     padding: 22px;
+#     margin: 20px 0;
+#     box-shadow: 0 0 18px rgba(34, 197, 94, 0.14);
+# }
+
+# .stat-card {
+#     background: #111827;
+#     border: 1px solid #334155;
+#     border-radius: 16px;
+#     padding: 20px;
+#     text-align: center;
+#     box-shadow: 0 0 15px rgba(56,189,248,0.08);
+# }
+
+# .stat-number {
+#     font-size: 32px;
+#     font-weight: 900;
+#     color: #22c55e;
+# }
+
+# .stat-label {
+#     font-size: 14px;
+#     color: #94a3b8;
+# }
+
+# .pipeline {
+#     background: #020617;
+#     border: 1px dashed #334155;
+#     border-radius: 18px;
+#     padding: 18px;
+#     margin: 20px 0;
+#     text-align: center;
+#     color: #e5e7eb;
+#     box-shadow: 0 0 18px rgba(56,189,248,0.08);
+# }
+
+# .pipeline span {
+#     color: #22c55e;
+#     font-weight: 800;
+# }
+
+# .stTextArea textarea {
+#     background-color: #020617 !important;
+#     color: #e5e7eb !important;
+#     border: 1px solid #94a3b8 !important;
+#     border-radius: 14px !important;
+# }
+
+# .stButton button {
+#     background: linear-gradient(90deg, #0284c7, #22c55e);
+#     color: white !important;
+#     border: none;
+#     border-radius: 12px;
+#     padding: 0.65rem 1.1rem;
+#     font-weight: 800;
+#     transition: 0.25s ease;
+#     position: relative;
+#     overflow: hidden;
+# }
+
+# .stButton button:hover {
+#     background: linear-gradient(90deg, #0369a1, #16a34a);
+#     transform: scale(1.03);
+#     color: white !important;
+#     border: none;
+# }
+
+# div[data-testid="stAlert"] {
+#     border-radius: 14px;
+# }
+
+# hr {
+#     border-color: #334155;
+# }
+
+# </style>
+# """, unsafe_allow_html=True)
+
+
+# st.sidebar.markdown("## 🛠️ FixMind")
+# st.sidebar.markdown("### Embedded AI Debugger")
+# page = st.sidebar.radio("Navigation", ["🏠 Home", "📚 Memory History", "ℹ️ About"])
+
+# for key, default in {
+#     "problem": "",
+#     "answer": "",
+#     "memory_found": [],
+#     "selected_memory": None,
+#     "show_memory": False,
+#     "show_ai_answer": False,
+#     "saved": False,
+# }.items():
+#     if key not in st.session_state:
+#         st.session_state[key] = default
+
+
+# if page == "🏠 Home":
+#     memories = load_memories()
+
+#     st.markdown("""
+#     <div class="hardware-card">
+#         <div style="display:flex; align-items:center; gap:28px;">
+#             <div class="ai-chip">⚙️</div>
+#             <div>
+#                 <h1>🛠️ FixMind</h1>
+#                 <h3>AI-Powered Embedded Systems Debugging Memory</h3>
+#                 <p><span class="led"></span>System Online · Memory Active · Hardware Debug Mode</p>
+#                 <span class="feature-badge">Gemini AI</span>
+#                 <span class="feature-badge">Cognee Semantic Memory</span>
+#                 <span class="feature-badge">JSON Backup</span>
+#                 <span class="warning-badge">Embedded Systems</span>
+#             </div>
+#         </div>
+#     </div>
+#     """, unsafe_allow_html=True)
+
+#     col1, col2, col3 = st.columns(3)
+
+#     with col1:
+#         st.markdown(f"""
+#         <div class="stat-card">
+#             <div class="stat-number">{len(memories)}</div>
+#             <div class="stat-label">Stored Memories</div>
+#         </div>
+#         """, unsafe_allow_html=True)
+
+#     with col2:
+#         st.markdown("""
+#         <div class="stat-card">
+#             <div class="stat-number">AI</div>
+#             <div class="stat-label">Debugging Engine</div>
+#         </div>
+#         """, unsafe_allow_html=True)
+
+#     with col3:
+#         cognee_status = "ON" if USE_COGNEE else "OFF"
+#         st.markdown(f"""
+#         <div class="stat-card">
+#             <div class="stat-number">{cognee_status}</div>
+#             <div class="stat-label">Cognee Memory</div>
+#         </div>
+#         """, unsafe_allow_html=True)
+
+#     st.markdown("""
+#     <div class="pipeline">
+#         🔧 Problem Input &nbsp; → &nbsp;
+#         <span>🧠 Memory Recall</span> &nbsp; → &nbsp;
+#         ⚙️ Gemini Analysis &nbsp; → &nbsp;
+#         <span>💾 Save Debug Fix</span>
+#     </div>
+#     """, unsafe_allow_html=True)
+
+#     st.markdown("### 🔌 Supported Hardware Debug Areas")
+
+#     p1, p2, p3, p4, p5 = st.columns(5)
+
+#     cards = [
+#         ("📡", "UART", "Serial TX/RX"),
+#         ("⚡", "SPI", "Sensor Bus"),
+#         ("🔌", "I2C", "Device Detect"),
+#         ("📈", "ADC", "Signal Read"),
+#         ("🧩", "GPIO", "Pin Logic"),
+#     ]
+
+#     for col, card in zip([p1, p2, p3, p4, p5], cards):
+#         icon, title, desc = card
+#         with col:
+#             st.markdown(f"""
+#             <div class="protocol-card">
+#                 <div class="protocol-icon">{icon}</div>
+#                 <h3>{title}</h3>
+#                 <p>{desc}</p>
+#             </div>
+#             """, unsafe_allow_html=True)
+
+#     st.markdown("### 🔧 Describe Your Embedded Systems Problem")
+
+#     problem_input = st.text_area(
+#         "Examples: STM32 UART not transmitting, ESP32 WiFi not connecting, I2C device not detected",
+#         height=150,
+#         value=st.session_state.problem
+#     )
+
+#     if st.button("🚀 Analyze Hardware Issue"):
+#         if problem_input.strip() == "":
+#             st.warning("Please enter your problem.")
+#         else:
+#             st.session_state.problem = problem_input
+#             st.session_state.answer = ""
+#             st.session_state.memory_found = []
+#             st.session_state.selected_memory = None
+#             st.session_state.show_memory = False
+#             st.session_state.show_ai_answer = False
+#             st.session_state.saved = False
+
+#             formatted_cognee = ""
+
+#             if USE_COGNEE:
+#                 with st.spinner("Searching Cognee memory..."):
+#                     cognee_results = recall_with_cognee(problem_input)
+#                     formatted_cognee = format_cognee_results(cognee_results)
+
+#             if formatted_cognee:
+#                 st.session_state.memory_found = [{
+#                     "problem": "Cognee Semantic Memory Match",
+#                     "date": "Retrieved from Cognee",
+#                     "solution": formatted_cognee
+#                 }]
+#             else:
+#                 st.session_state.memory_found = search_memory(problem_input)
+
+#             if not st.session_state.memory_found:
+#                 st.session_state.show_ai_answer = True
+
+#     if st.session_state.memory_found and not st.session_state.show_ai_answer:
+#         memory = st.session_state.memory_found[0]
+
+#         st.markdown(f"""
+#         <div class="memory-card">
+#             <h3>🧠 Similar Engineering Memory Found</h3>
+#             <p><b>Stored Problem:</b> {memory['problem']}</p>
+#             <p><b>Saved:</b> {memory['date']}</p>
+#             <p>This previous debugging session may help with your current hardware issue.</p>
+#         </div>
+#         """, unsafe_allow_html=True)
+
+#         col1, col2 = st.columns(2)
+
+#         with col1:
+#             if st.button("👁 View Previous Fix"):
+#                 st.session_state.selected_memory = memory
+#                 st.session_state.show_memory = True
+#                 st.session_state.show_ai_answer = False
+
+#         with col2:
+#             if st.button("✨ Generate New AI Solution"):
+#                 st.session_state.selected_memory = None
+#                 st.session_state.show_memory = False
+#                 st.session_state.show_ai_answer = True
+#                 st.session_state.answer = ""
+#                 st.session_state.saved = False
+
+#     if st.session_state.show_memory and st.session_state.selected_memory:
+#         memory = st.session_state.selected_memory
+
+#         st.markdown("## Previous Fix")
+#         st.write(f"**Problem:** {memory['problem']}")
+#         st.write(f"**Date:** {memory['date']}")
+#         st.markdown(memory["solution"])
+
+#     if st.session_state.show_ai_answer:
+#         if st.session_state.answer == "":
+#             with st.spinner("FixMind is analyzing your hardware issue..."):
+#                 try:
+#                     st.session_state.answer = ask_gemini(st.session_state.problem)
+#                 except Exception as e:
+#                     st.error("Gemini connection failed.")
+#                     st.code(str(e))
+
+#         if st.session_state.answer:
+#             st.success("✅ FixMind Response")
+#             st.markdown(st.session_state.answer)
+#             st.divider()
+
+#             if not st.session_state.saved:
+#                 if st.button("💾 Save Engineering Knowledge"):
+#                     json_saved = save_memory(
+#                         st.session_state.problem,
+#                         st.session_state.answer
+#                     )
+
+#                     cognee_saved = False
+
+#                     if USE_COGNEE:
+#                         with st.spinner("Saving to Cognee semantic memory..."):
+#                             cognee_saved = remember_with_cognee(
+#                                 st.session_state.problem,
+#                                 st.session_state.answer
+#                             )
+
+#                     st.session_state.saved = True
+
+#                     if USE_COGNEE and cognee_saved:
+#                         st.success("Memory saved successfully in JSON + Cognee!")
+#                     elif not USE_COGNEE:
+#                         if json_saved:
+#                             st.success("Memory saved successfully in JSON. Cognee is disabled.")
+#                         else:
+#                             st.info("This memory already exists in JSON.")
+#                     else:
+#                         if json_saved:
+#                             st.warning("Saved in JSON. Cognee failed, but backup memory is safe.")
+#                         else:
+#                             st.info("This memory already exists in JSON.")
+#             else:
+#                 st.info("This solution is already saved.")
+
+
+# elif page == "📚 Memory History":
+#     st.markdown("""
+#     <div class="hardware-card">
+#         <div style="display:flex; align-items:center; gap:25px;">
+#             <div class="ai-chip">🧠</div>
+#             <div>
+#                 <h1>📚 Memory History</h1>
+#                 <h3>Previously solved embedded debugging sessions</h3>
+#                 <p><span class="led"></span>Local JSON memory active</p>
+#             </div>
+#         </div>
+#     </div>
+#     """, unsafe_allow_html=True)
+
+#     memories = load_memories()
+
+#     if not memories:
+#         st.info("No memories stored yet.")
+#     else:
+#         st.success(f"{len(memories)} debugging memories stored.")
+
+#         for index, memory in enumerate(memories):
+#             with st.expander(f"🧠 {index + 1}. {memory['problem']}"):
+#                 st.write(f"**Date:** {memory['date']}")
+#                 st.markdown(memory["solution"])
+
+#                 if st.button("🗑 Delete Memory", key=f"delete_{index}"):
+#                     delete_memory(index)
+#                     st.success("Memory deleted successfully!")
+#                     st.rerun()
+
+
+# else:
+#     st.markdown("""
+#     <div class="hardware-card">
+#         <div style="display:flex; align-items:center; gap:25px;">
+#             <div class="ai-chip">🔌</div>
+#             <div>
+#                 <h1>ℹ️ About FixMind</h1>
+#                 <h3>AI debugging memory for embedded systems engineers</h3>
+#                 <p>
+#                 FixMind helps engineers debug STM32, ESP32, Arduino, sensors,
+#                 UART, SPI, I2C, ADC, and hardware communication problems.
+#                 </p>
+#                 <span class="feature-badge">Gemini</span>
+#                 <span class="feature-badge">Cognee</span>
+#                 <span class="feature-badge">Streamlit</span>
+#                 <span class="feature-badge">GitHub Backup</span>
+#             </div>
+#         </div>
+#     </div>
+#     """, unsafe_allow_html=True)
+
+
+# import streamlit as st
+# import google.generativeai as genai
+# from dotenv import load_dotenv
+# import os
+
+# from memory.memory_manager import (
+#     save_memory,
+#     load_memories,
+#     search_memory,
+#     delete_memory,
+# )
+
+# from memory.cognee_memory import remember_with_cognee, recall_with_cognee
+
+# load_dotenv()
+
+# USE_COGNEE = os.getenv("USE_COGNEE", "false").lower() == "true"
+
+# genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+# model = genai.GenerativeModel("gemini-2.5-flash")
+
+
+# def ask_gemini(problem):
+#     prompt = f"""
+# You are FixMind, a senior Embedded Systems debugging assistant.
+
+# User problem:
+# {problem}
+
+# Give a SHORT, practical debugging response.
+
+# Use exactly this format:
+
+# ### Possible Causes
+# - Cause 1
+# - Cause 2
+# - Cause 3
+# - Cause 4
+
+# ### Step-by-Step Checks
+# 1. Check ...
+# 2. Verify ...
+# 3. Test ...
+# 4. Confirm ...
+
+# ### Most Likely Fix
+# Write the most likely fix in 2-3 lines.
+
+# ### Prevention Tip
+# Write one practical prevention tip.
+
+# Rules:
+# - Keep the answer concise.
+# - Focus on STM32, ESP32, Arduino, UART, SPI, I2C, ADC, sensors, embedded hardware.
+# """
+#     response = model.generate_content(prompt)
+#     return response.text
+
+
+# def format_cognee_results(results):
+#     if not results:
+#         return ""
+
+#     invalid_phrases = [
+#         "does not contain any information",
+#         "does not contain information",
+#         "provided context does not",
+#         "no information about",
+#         "cannot answer",
+#         "not enough information",
+#         "no relevant information",
+#     ]
+
+#     text = str(results).strip()
+
+#     if any(phrase in text.lower() for phrase in invalid_phrases):
+#         return ""
+
+#     try:
+#         if isinstance(results, list):
+#             first = results[0]
+
+#             if isinstance(first, dict):
+#                 search_result = first.get("search_result", "")
+
+#                 if isinstance(search_result, list) and search_result:
+#                     result_text = str(search_result[0])
+#                     if any(phrase in result_text.lower() for phrase in invalid_phrases):
+#                         return ""
+#                     return result_text
+
+#                 if isinstance(search_result, str):
+#                     if any(phrase in search_result.lower() for phrase in invalid_phrases):
+#                         return ""
+#                     return search_result
+#     except Exception:
+#         pass
+
+#     return text
+
+
+# st.set_page_config(
+#     page_title="FixMind",
+#     page_icon="🛠️",
+#     layout="wide"
+# )
+
+
+# st.markdown("""
+# <style>
+
+# .stApp {
+#     background:
+#         radial-gradient(circle at 20% 20%, rgba(56,189,248,0.16), transparent 30%),
+#         radial-gradient(circle at 80% 10%, rgba(34,197,94,0.12), transparent 25%),
+#         linear-gradient(135deg, #020617 0%, #0f172a 45%, #111827 100%);
+#     color: #e5e7eb;
+# }
+
+# .stApp::before {
+#     content: "";
+#     position: fixed;
+#     inset: 0;
+#     background-image:
+#         linear-gradient(rgba(56,189,248,0.07) 1px, transparent 1px),
+#         linear-gradient(90deg, rgba(56,189,248,0.07) 1px, transparent 1px);
+#     background-size: 42px 42px;
+#     animation: circuitMove 18s linear infinite;
+#     pointer-events: none;
+#     z-index: 0;
+# }
+
+# @keyframes circuitMove {
+#     from { background-position: 0 0; }
+#     to { background-position: 120px 120px; }
+# }
+
+# section[data-testid="stSidebar"] {
+#     background: #020617;
+#     border-right: 1px solid #1e293b;
+# }
+
+# section[data-testid="stSidebar"] * {
+#     color: #e5e7eb !important;
+# }
+
+# h1, h2, h3 {
+#     color: #38bdf8 !important;
+#     font-weight: 900 !important;
+# }
+
+# p, li, label {
+#     color: #d1d5db !important;
+# }
+
+# .hardware-card {
+#     background: linear-gradient(135deg, rgba(15,23,42,0.95), rgba(17,24,39,0.95));
+#     border: 1px solid #334155;
+#     border-radius: 24px;
+#     padding: 34px;
+#     margin-bottom: 26px;
+#     box-shadow: 0 0 28px rgba(56, 189, 248, 0.15);
+#     animation: softGlow 3s ease-in-out infinite alternate;
+# }
+
+# @keyframes softGlow {
+#     from { box-shadow: 0 0 18px rgba(56, 189, 248, 0.12); }
+#     to { box-shadow: 0 0 36px rgba(34, 197, 94, 0.25); }
+# }
+
+# .ai-chip {
+#     font-size: 68px;
+#     animation: floatChip 3s ease-in-out infinite;
+#     text-shadow: 0 0 24px rgba(56,189,248,0.8);
+# }
+
+# @keyframes floatChip {
+#     0% { transform: translateY(0px) rotate(0deg); }
+#     50% { transform: translateY(-12px) rotate(4deg); }
+#     100% { transform: translateY(0px) rotate(0deg); }
+# }
+
+# .led {
+#     height: 12px;
+#     width: 12px;
+#     background-color: #22c55e;
+#     border-radius: 50%;
+#     display: inline-block;
+#     box-shadow: 0 0 14px #22c55e;
+#     animation: blink 1.2s infinite;
+#     margin-right: 8px;
+# }
+
+# @keyframes blink {
+#     0%, 100% { opacity: 1; }
+#     50% { opacity: 0.25; }
+# }
+
+# .feature-badge {
+#     display: inline-block;
+#     background: #064e3b;
+#     color: #bbf7d0;
+#     padding: 8px 15px;
+#     border-radius: 999px;
+#     font-size: 13px;
+#     font-weight: 800;
+#     margin: 6px 7px 0 0;
+# }
+
+# .warning-badge {
+#     display: inline-block;
+#     background: #78350f;
+#     color: #fde68a;
+#     padding: 8px 15px;
+#     border-radius: 999px;
+#     font-size: 13px;
+#     font-weight: 800;
+#     margin: 6px 7px 0 0;
+# }
+
+# .protocol-card {
+#     background: #020617;
+#     border: 1px solid #334155;
+#     border-radius: 18px;
+#     padding: 18px;
+#     text-align: center;
+#     transition: 0.25s ease;
+#     box-shadow: 0 0 16px rgba(56,189,248,0.08);
+# }
+
+# .protocol-card:hover {
+#     transform: translateY(-5px);
+#     border-color: #22c55e;
+#     box-shadow: 0 0 24px rgba(34,197,94,0.22);
+# }
+
+# .protocol-icon {
+#     font-size: 30px;
+#     margin-bottom: 8px;
+# }
+
+# .memory-card {
+#     background: #0f172a;
+#     border-left: 5px solid #22c55e;
+#     border-radius: 18px;
+#     padding: 22px;
+#     margin: 20px 0;
+#     box-shadow: 0 0 18px rgba(34, 197, 94, 0.14);
+# }
+
+# .response-card {
+#     background: #020617;
+#     border: 1px solid #334155;
+#     border-radius: 18px;
+#     padding: 24px;
+#     margin-top: 18px;
+#     box-shadow: 0 0 18px rgba(56, 189, 248, 0.12);
+# }
+
+# .stat-card {
+#     background: #111827;
+#     border: 1px solid #334155;
+#     border-radius: 16px;
+#     padding: 20px;
+#     text-align: center;
+#     box-shadow: 0 0 15px rgba(56,189,248,0.08);
+# }
+
+# .stat-number {
+#     font-size: 32px;
+#     font-weight: 900;
+#     color: #22c55e;
+# }
+
+# .stat-label {
+#     font-size: 14px;
+#     color: #94a3b8;
+# }
+
+# .pipeline {
+#     background: #020617;
+#     border: 1px dashed #334155;
+#     border-radius: 18px;
+#     padding: 18px;
+#     margin: 20px 0;
+#     text-align: center;
+#     color: #e5e7eb;
+#     box-shadow: 0 0 18px rgba(56,189,248,0.08);
+# }
+
+# .pipeline span {
+#     color: #22c55e;
+#     font-weight: 800;
+# }
+
+# .stTextArea textarea {
+#     background-color: #020617 !important;
+#     color: #e5e7eb !important;
+#     border: 1px solid #94a3b8 !important;
+#     border-radius: 14px !important;
+# }
+
+# .stButton button {
+#     background: linear-gradient(90deg, #0284c7, #22c55e);
+#     color: white !important;
+#     border: none;
+#     border-radius: 12px;
+#     padding: 0.65rem 1.1rem;
+#     font-weight: 800;
+#     transition: 0.25s ease;
+#     position: relative;
+#     overflow: hidden;
+# }
+
+# .stButton button:hover {
+#     background: linear-gradient(90deg, #0369a1, #16a34a);
+#     transform: scale(1.03);
+#     color: white !important;
+#     border: none;
+# }
+
+# .stButton button::after {
+#     content: "";
+#     position: absolute;
+#     top: 0;
+#     left: -80%;
+#     width: 50%;
+#     height: 100%;
+#     background: rgba(255,255,255,0.25);
+#     transform: skewX(-20deg);
+#     animation: shine 3s infinite;
+# }
+
+# @keyframes shine {
+#     0% { left: -80%; }
+#     50% { left: 130%; }
+#     100% { left: 130%; }
+# }
+
+# div[data-testid="stAlert"] {
+#     border-radius: 14px;
+# }
+
+# hr {
+#     border-color: #334155;
+# }
+
+# </style>
+# """, unsafe_allow_html=True)
+
+
+# st.sidebar.markdown("## 🛠️ FixMind")
+# st.sidebar.markdown("### Embedded AI Debugger")
+# page = st.sidebar.radio("Navigation", ["🏠 Home", "📚 Memory History", "ℹ️ About"])
+
+
+# for key, default in {
+#     "problem": "",
+#     "answer": "",
+#     "memory_found": [],
+#     "selected_memory": None,
+#     "show_memory": False,
+#     "show_ai_answer": False,
+#     "saved": False,
+# }.items():
+#     if key not in st.session_state:
+#         st.session_state[key] = default
+
+
+# if page == "🏠 Home":
+#     memories = load_memories()
+
+#     st.markdown("""
+#     <div class="hardware-card">
+#         <div style="display:flex; align-items:center; gap:28px;">
+#             <div class="ai-chip">⚙️</div>
+#             <div>
+#                 <h1>🛠️ FixMind</h1>
+#                 <h3>AI-Powered Embedded Systems Debugging Memory</h3>
+#                 <p><span class="led"></span>System Online · Memory Active · Hardware Debug Mode</p>
+#                 <span class="feature-badge">Gemini AI</span>
+#                 <span class="feature-badge">Cognee Semantic Memory</span>
+#                 <span class="feature-badge">JSON Backup</span>
+#                 <span class="warning-badge">Embedded Systems</span>
+#             </div>
+#         </div>
+#     </div>
+#     """, unsafe_allow_html=True)
+
+#     col1, col2, col3 = st.columns(3)
+
+#     with col1:
+#         st.markdown(f"""
+#         <div class="stat-card">
+#             <div class="stat-number">{len(memories)}</div>
+#             <div class="stat-label">Stored Memories</div>
+#         </div>
+#         """, unsafe_allow_html=True)
+
+#     with col2:
+#         st.markdown("""
+#         <div class="stat-card">
+#             <div class="stat-number">AI</div>
+#             <div class="stat-label">Debugging Engine</div>
+#         </div>
+#         """, unsafe_allow_html=True)
+
+#     with col3:
+#         cognee_status = "ON" if USE_COGNEE else "OFF"
+#         st.markdown(f"""
+#         <div class="stat-card">
+#             <div class="stat-number">{cognee_status}</div>
+#             <div class="stat-label">Cognee Memory</div>
+#         </div>
+#         """, unsafe_allow_html=True)
+
+#     st.markdown("""
+#     <div class="pipeline">
+#         🔧 Problem Input &nbsp; → &nbsp;
+#         <span>🧠 Memory Recall</span> &nbsp; → &nbsp;
+#         ⚙️ Gemini Analysis &nbsp; → &nbsp;
+#         <span>💾 Save Debug Fix</span>
+#     </div>
+#     """, unsafe_allow_html=True)
+
+#     st.markdown("### 🔌 Supported Hardware Debug Areas")
+
+#     p1, p2, p3, p4, p5 = st.columns(5)
+
+#     cards = [
+#         ("📡", "UART", "Serial TX/RX"),
+#         ("⚡", "SPI", "Sensor Bus"),
+#         ("🔌", "I2C", "Device Detect"),
+#         ("📈", "ADC", "Signal Read"),
+#         ("🧩", "GPIO", "Pin Logic"),
+#     ]
+
+#     for col, card in zip([p1, p2, p3, p4, p5], cards):
+#         icon, title, desc = card
+#         with col:
+#             st.markdown(f"""
+#             <div class="protocol-card">
+#                 <div class="protocol-icon">{icon}</div>
+#                 <h3>{title}</h3>
+#                 <p>{desc}</p>
+#             </div>
+#             """, unsafe_allow_html=True)
+
+#     st.markdown("### 🔧 Describe Your Embedded Systems Problem")
+
+#     problem_input = st.text_area(
+#         "Examples: STM32 UART not transmitting, ESP32 WiFi not connecting, I2C device not detected",
+#         height=150,
+#         value=st.session_state.problem
+#     )
+
+#     if st.button("🚀 Analyze Hardware Issue"):
+#         if problem_input.strip() == "":
+#             st.warning("Please enter your problem.")
+#         else:
+#             st.session_state.problem = problem_input
+#             st.session_state.answer = ""
+#             st.session_state.memory_found = []
+#             st.session_state.selected_memory = None
+#             st.session_state.show_memory = False
+#             st.session_state.show_ai_answer = False
+#             st.session_state.saved = False
+
+#             formatted_cognee = ""
+
+#             if USE_COGNEE:
+#                 with st.spinner("Searching Cognee memory..."):
+#                     cognee_results = recall_with_cognee(problem_input)
+#                     formatted_cognee = format_cognee_results(cognee_results)
+
+#             if formatted_cognee:
+#                 st.session_state.memory_found = [{
+#                     "problem": "Cognee Semantic Memory Match",
+#                     "date": "Retrieved from Cognee",
+#                     "solution": formatted_cognee
+#                 }]
+#             else:
+#                 st.session_state.memory_found = search_memory(problem_input)
+
+#             if not st.session_state.memory_found:
+#                 st.session_state.show_ai_answer = True
+
+#     if st.session_state.memory_found and not st.session_state.show_ai_answer:
+#         memory = st.session_state.memory_found[0]
+
+#         st.markdown(f"""
+#         <div class="memory-card">
+#             <h3>🧠 Similar Engineering Memory Found</h3>
+#             <p><b>Stored Problem:</b> {memory['problem']}</p>
+#             <p><b>Saved:</b> {memory['date']}</p>
+#             <p>This previous debugging session may help with your current hardware issue.</p>
+#         </div>
+#         """, unsafe_allow_html=True)
+
+#         col1, col2 = st.columns(2)
+
+#         with col1:
+#             if st.button("👁 View Previous Fix"):
+#                 st.session_state.selected_memory = memory
+#                 st.session_state.show_memory = True
+#                 st.session_state.show_ai_answer = False
+
+#         with col2:
+#             if st.button("✨ Generate New AI Solution"):
+#                 st.session_state.selected_memory = None
+#                 st.session_state.show_memory = False
+#                 st.session_state.show_ai_answer = True
+#                 st.session_state.answer = ""
+#                 st.session_state.saved = False
+
+#     if st.session_state.show_memory and st.session_state.selected_memory:
+#         memory = st.session_state.selected_memory
+
+#         st.markdown('<div class="response-card">', unsafe_allow_html=True)
+#         st.markdown("## Previous Fix")
+#         st.write(f"**Problem:** {memory['problem']}")
+#         st.write(f"**Date:** {memory['date']}")
+#         st.markdown(memory["solution"])
+#         st.markdown('</div>', unsafe_allow_html=True)
+
+#     if st.session_state.show_ai_answer:
+#         if st.session_state.answer == "":
+#             with st.spinner("FixMind is analyzing your hardware issue..."):
+#                 try:
+#                     st.session_state.answer = ask_gemini(st.session_state.problem)
+#                 except Exception as e:
+#                     st.error("Gemini connection failed.")
+#                     st.code(str(e))
+
+#         if st.session_state.answer:
+#             st.success("✅ FixMind Response")
+
+#             st.markdown('<div class="response-card">', unsafe_allow_html=True)
+#             st.markdown(st.session_state.answer)
+#             st.markdown('</div>', unsafe_allow_html=True)
+
+#             st.divider()
+
+#             if not st.session_state.saved:
+#                 if st.button("💾 Save Engineering Knowledge"):
+#                     json_saved = save_memory(
+#                         st.session_state.problem,
+#                         st.session_state.answer
+#                     )
+
+#                     cognee_saved = False
+
+#                     if USE_COGNEE:
+#                         with st.spinner("Saving to Cognee semantic memory..."):
+#                             cognee_saved = remember_with_cognee(
+#                                 st.session_state.problem,
+#                                 st.session_state.answer
+#                             )
+
+#                     st.session_state.saved = True
+
+#                     if USE_COGNEE and cognee_saved:
+#                         st.success("Memory saved successfully in JSON + Cognee!")
+#                     elif not USE_COGNEE:
+#                         if json_saved:
+#                             st.success("Memory saved successfully in JSON. Cognee is disabled.")
+#                         else:
+#                             st.info("This memory already exists in JSON.")
+#                     else:
+#                         if json_saved:
+#                             st.warning("Saved in JSON. Cognee failed, but backup memory is safe.")
+#                         else:
+#                             st.info("This memory already exists in JSON.")
+#             else:
+#                 st.info("This solution is already saved.")
+
+
+# elif page == "📚 Memory History":
+#     st.markdown("""
+#     <div class="hardware-card">
+#         <div style="display:flex; align-items:center; gap:25px;">
+#             <div class="ai-chip">🧠</div>
+#             <div>
+#                 <h1>📚 Memory History</h1>
+#                 <h3>Previously solved embedded debugging sessions</h3>
+#                 <p><span class="led"></span>Local JSON memory active</p>
+#             </div>
+#         </div>
+#     </div>
+#     """, unsafe_allow_html=True)
+
+#     memories = load_memories()
+
+#     if not memories:
+#         st.info("No memories stored yet.")
+#     else:
+#         st.success(f"{len(memories)} debugging memories stored.")
+
+#         for index, memory in enumerate(memories):
+#             with st.expander(f"🧠 {index + 1}. {memory['problem']}"):
+#                 st.write(f"**Date:** {memory['date']}")
+#                 st.markdown(memory["solution"])
+
+#                 if st.button("🗑 Delete Memory", key=f"delete_{index}"):
+#                     delete_memory(index)
+#                     st.success("Memory deleted successfully!")
+#                     st.rerun()
+
+
+# else:
+#     st.markdown("""
+#     <div class="hardware-card">
+#         <div style="display:flex; align-items:center; gap:25px;">
+#             <div class="ai-chip">🔌</div>
+#             <div>
+#                 <h1>ℹ️ About FixMind</h1>
+#                 <h3>AI debugging memory for embedded systems engineers</h3>
+#                 <p>
+#                 FixMind helps engineers debug STM32, ESP32, Arduino, sensors,
+#                 UART, SPI, I2C, ADC, and hardware communication problems.
+#                 </p>
+#                 <span class="feature-badge">Gemini</span>
+#                 <span class="feature-badge">Cognee</span>
+#                 <span class="feature-badge">Streamlit</span>
+#                 <span class="feature-badge">GitHub Backup</span>
+#             </div>
+#         </div>
+#     </div>
+#     """, unsafe_allow_html=True)
 
 
 # #No.2 Working Code with UI
