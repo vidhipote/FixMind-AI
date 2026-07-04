@@ -80,74 +80,56 @@ Store in:
 
 # 🖼️ Application Screenshots
 
-Create a folder named:
-
-```
-screenshots/
-```
-
-Add your screenshots with these names:
-
-```
-screenshots/
-│
-├── home.png
-├── memory_found.png
-├── previous_fix.png
-├── ai_response.png
-├── memory_history.png
-├── cognee_cloud.png
-```
-
-Then GitHub will automatically display them.
-
 ---
 
 ## 🏠 Home Page
 ```
-
-<img width="1918" height="863" alt="home" src="https://github.com/user-attachments/assets/1a58f4ea-6d38-4208-909d-37fde4dd4c59" />
+<img width="1918" height="863" alt="home" src="https://github.com/user-attachments/assets/dcf5ff85-15f8-4c85-9f16-448d88b43d24" />
 
 ```
-
 ---
 
 ## 🧠 Memory Recall
 
-```markdown
-![Memory Recall](screenshots/memory_found.png)
+```
+<img width="1918" height="877" alt="memory recall (2)" src="https://github.com/user-attachments/assets/65d842bc-8fa6-4ee5-b5df-d1721177c01b" />
+
 ```
 
 ---
 
 ## 📖 Previous Engineering Fix
 
-```markdown
-![Previous Fix](screenshots/previous_fix.png)
+```
+<img width="1918" height="756" alt="previousfix" src="https://github.com/user-attachments/assets/4301b5d3-590b-4235-a50b-ad1d1661e1be" />
+
 ```
 
 ---
 
 ## 🤖 AI Generated Solution
 
-```markdown
-![AI Response](screenshots/ai_response.png)
+```
+<img width="1918" height="872" alt="aigeneartedsolu" src="https://github.com/user-attachments/assets/ee43b223-b8c4-4f14-bac3-fc794a1dc081" />
+
 ```
 
 ---
 
 ## 📚 Memory History
 
-```markdown
-![Memory History](screenshots/memory_history.png)
+```
+<img width="1918" height="876" alt="memory recall" src="https://github.com/user-attachments/assets/eff695fb-691e-4e00-b9df-984863c02094" />
+
 ```
 
 ---
 
 ## ☁ Cognee Cloud Memory
 
-```markdown
-![Cognee Cloud](screenshots/cognee_cloud.png)
+```
+<img width="1912" height="873" alt="cogneecloud" src="https://github.com/user-attachments/assets/7610bea2-59cc-4064-9e39-08ae58115c07" />
+
 ```
 
 ---
@@ -184,13 +166,6 @@ FixMind/
 │   ├── cognee_memory.py
 │   └── memory_store.json
 │
-├── screenshots/
-│   ├── home.png
-│   ├── memory_found.png
-│   ├── previous_fix.png
-│   ├── ai_response.png
-│   ├── memory_history.png
-│   └── cognee_cloud.png
 │
 └── assets/
 ```
