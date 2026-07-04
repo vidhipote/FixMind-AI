@@ -83,54 +83,45 @@ Store in:
 ---
 
 ## 🏠 Home Page
-```
-<img width="1918" height="863" alt="home" src="https://github.com/user-attachments/assets/dcf5ff85-15f8-4c85-9f16-448d88b43d24" />
 
-```
+> <img width="1918" height="863" alt="home" src="https://github.com/user-attachments/assets/dcf5ff85-15f8-4c85-9f16-448d88b43d24" />
+
 ---
 
 ## 🧠 Memory Recall
 
-```
-<img width="1918" height="877" alt="memory recall (2)" src="https://github.com/user-attachments/assets/65d842bc-8fa6-4ee5-b5df-d1721177c01b" />
 
-```
+> <img width="1918" height="877" alt="memory recall (2)" src="https://github.com/user-attachments/assets/65d842bc-8fa6-4ee5-b5df-d1721177c01b" />
+
+
 
 ---
 
 ## 📖 Previous Engineering Fix
 
-```
-<img width="1918" height="756" alt="previousfix" src="https://github.com/user-attachments/assets/4301b5d3-590b-4235-a50b-ad1d1661e1be" />
+> <img width="1918" height="756" alt="previousfix" src="https://github.com/user-attachments/assets/4301b5d3-590b-4235-a50b-ad1d1661e1be" />
 
-```
 
 ---
 
 ## 🤖 AI Generated Solution
 
-```
-<img width="1918" height="872" alt="aigeneartedsolu" src="https://github.com/user-attachments/assets/ee43b223-b8c4-4f14-bac3-fc794a1dc081" />
 
-```
+> <img width="1918" height="872" alt="aigeneartedsolu" src="https://github.com/user-attachments/assets/ee43b223-b8c4-4f14-bac3-fc794a1dc081" />
 
 ---
 
 ## 📚 Memory History
 
-```
-<img width="1918" height="876" alt="memory recall" src="https://github.com/user-attachments/assets/eff695fb-691e-4e00-b9df-984863c02094" />
 
-```
+> <img width="1918" height="876" alt="memory recall" src="https://github.com/user-attachments/assets/eff695fb-691e-4e00-b9df-984863c02094" />
 
 ---
 
 ## ☁ Cognee Cloud Memory
 
-```
-<img width="1912" height="873" alt="cogneecloud" src="https://github.com/user-attachments/assets/7610bea2-59cc-4064-9e39-08ae58115c07" />
 
-```
+> <img width="1912" height="873" alt="cogneecloud" src="https://github.com/user-attachments/assets/7610bea2-59cc-4064-9e39-08ae58115c07" />
 
 ---
 
