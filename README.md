@@ -104,10 +104,10 @@ Then GitHub will automatically display them.
 ---
 
 ## 🏠 Home Page
+```
 
-```markdown
-![Home Page]<img width="1918" height="863" alt="home" src="https://github.com/user-attachments/assets/1a58f4ea-6d38-4208-909d-37fde4dd4c59" />
-(screenshots/home.png)
+<img width="1918" height="863" alt="home" src="https://github.com/user-attachments/assets/1a58f4ea-6d38-4208-909d-37fde4dd4c59" />
+
 ```
 
 ---
