@@ -106,7 +106,8 @@ Then GitHub will automatically display them.
 ## 🏠 Home Page
 
 ```markdown
-![Home Page](screenshots/home.png)
+![<img width="1918" height="863" alt="home" src="https://github.com/user-attachments/assets/f95da2c5-207d-4bcf-b3ac-95524769e6c9" />
+](screenshots/home.png)
 ```
 
 ---
